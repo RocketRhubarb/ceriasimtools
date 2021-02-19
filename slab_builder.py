@@ -53,6 +53,34 @@ def ceria_crystallographic(cellparam):
     return ceria
 
 
+def orthogonalize_111(slab):
+    '''
+    Transforms the ceria(111) surface from a tetragonal unit cell to orthononal one
+
+    Input:
+        slab: Atoms object, with tetragonal cell
+
+    Retruns:
+        slab: Atoms object, with orthogonal cell
+    '''
+    cell = slab.get_cell()
+
+    cell[1, 0] = 0.0
+
+    slab.set_cell(cell)
+
+    positions = slab.get_positions()
+
+    for i_pos in range(len(positions)):
+        for i_dir in range(3):
+            if positions[i_pos, i_dir] >= cell[i_dir, i_dir]-0.05:
+                positions[i_pos, i_dir] -= cell[i_dir, i_dir]
+
+    slab.set_positions(positions)
+
+    return slab
+
+
 def slab(cellparam=5.429832, vacuum=10, layers=4, repetitions=(1, 1, 1), indices=(1, 1, 1), waterspecies='a'):
     '''
     Generate Ceria (CeO2) slab with the (111) facet excposed to vacuum with water ontop for VASP calculations.
